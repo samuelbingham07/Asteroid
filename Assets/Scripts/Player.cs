@@ -9,11 +9,16 @@ public class Player : MonoBehaviour
     float moveInput;
     float rotateInput;
     Rigidbody2D rBody;
-    public float movePower = 13f;
+    public float movePower = 15f;
     public float rotatePower = 200f;
     public float projectileOffset = .8f;
 
     public GameObject projectilePrefab;
+
+    public float invincibilityTimer = 1;
+    bool isInvincible = true;
+
+    SpriteRenderer sRenderer;
 
     private void OnEnable()
     {
@@ -32,6 +37,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         rBody = GetComponent<Rigidbody2D>();
+        sRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -40,6 +46,17 @@ public class Player : MonoBehaviour
         {
             Vector3 projectilePosition = transform.position + transform.up * projectileOffset;
             Instantiate(projectilePrefab, projectilePosition, transform.rotation);
+        }
+
+        if (isInvincible)
+        {
+            sRenderer.color = Color.green;
+            invincibilityTimer -= Time.deltaTime;
+            if (invincibilityTimer <= 0)
+            {
+                sRenderer.color = Color.white;
+                isInvincible = false;
+            }
         }
     }
 
@@ -53,5 +70,13 @@ public class Player : MonoBehaviour
 
         float newRotation = rBody.rotation + rotateInput * rotatePower * Time.fixedDeltaTime;
         rBody.MoveRotation(newRotation);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (isInvincible == false)
+        {
+            GameManager.instance.PlayerDeath();
+        }
     }
 }

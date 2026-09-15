@@ -1,21 +1,26 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-
     public static GameManager instance;
 
     public GameObject player;
     public GameObject asteroid;
 
     int asteroidsToSpawn = 5;
+    public float asteroidPadding = 2;
 
-    public List<GameObject> asteroidsList = new();
+    public List<GameObject> asteroidList = new();
 
-    void Awake()
+    public int playerLives = 3;
+    GameObject currentPlayer;
+
+    public int score = 0;
+
+    private void Awake()
     {
         if (instance != null && instance != this)
         {
@@ -26,64 +31,113 @@ public class GameManager : MonoBehaviour
             instance = this;
         }
     }
-
-    private void Start()
+    void Start()
     {
         StartGame();
     }
 
-    // Update is called once per frame
     void Update()
     {
 
     }
 
+    public void AddToScore(int scoreValue)
+    {
+        score += scoreValue;
+    }
+
     void SpawnPlayer()
     {
-        Instantiate(player, Vector3.zero, Quaternion.identity);
+        currentPlayer = Instantiate(player, Vector3.zero, Quaternion.identity);
     }
 
     void SpawnAsteroids()
     {
-        for (int x = 0; x < asteroidsToSpawn; x++)
+        for (int i = 0; i < asteroidsToSpawn; i++)
         {
-            GameObject newAsteroid = Instantiate(asteroid, randomAsteroidPosition(), Quaternion.identity);
+            GameObject newAsteroid = Instantiate(asteroid, GetRandomAsteroidPosition(), Quaternion.identity);
             AddAsteroid(newAsteroid);
         }
+    }
 
+    public void BreakAsteroids(int asteroidGeneration, Transform parentTransform)
+    {
+        for (int i = 0; i < asteroidGeneration; i++)
+        {
+            GameObject newAsteroid = Instantiate(asteroid, parentTransform.position, parentTransform.rotation);
+            AddAsteroid(newAsteroid);
+            newAsteroid.GetComponent<Asteroid>().generation = asteroidGeneration;
+        }
     }
 
     void StartGame()
     {
-        SpawnAsteroids();
         SpawnPlayer();
-    }
-
-    Vector3 randomAsteroidPosition()
-    {
-        float height = Camera.main.orthographicSize * 2;
-        float width = Camera.main.orthographicSize * 2 * Camera.main.aspect;
-
-        float randX = Random.Range(-width / 2, width / 2);
-        float randY = Random.Range(-height / 2, height / 2);
-
-        Vector3 randPos = new Vector3(randX, randY, 0);
-
-        return randPos;
+        SpawnAsteroids();
     }
 
     public void AddAsteroid(GameObject asteroid)
     {
-        asteroidsList.Add(asteroid);
+        asteroidList.Add(asteroid);
     }
 
-    public void RemoveAsteroid(GameObject g)
+    public void RemoveAsteroid(GameObject asteroid)
     {
-        asteroidsList.Remove(g);
-        if(asteroidsList.Count == 0)
+        asteroidList.Remove(asteroid);
+        if (asteroidList.Count == 0)
         {
             asteroidsToSpawn++;
             SpawnAsteroids();
+        }
+    }
+
+    Vector3 GetRandomAsteroidPosition()
+    {
+        float height = Camera.main.orthographicSize * 2 - 2;
+        float width = (Camera.main.orthographicSize * 2 - 2) * Camera.main.aspect;
+        Vector3 randomPosition = Vector3.zero;
+        int randomZone = Random.Range(0, 4);
+
+        if (randomZone == 0)
+        {
+            float randX = Random.Range(-width / 2, width / 2);
+            float randY = Random.Range(height / 2, height / 2 - asteroidPadding);
+            randomPosition = new Vector3(randX, randY, 0);
+        }
+        else if (randomZone == 1)
+        {
+            float randX = Random.Range(-width / 2, width / 2);
+            float randY = Random.Range(-height / 2, -height / 2 + asteroidPadding);
+            randomPosition = new Vector3(randX, randY, 0);
+        }
+        else if (randomZone == 2)
+        {
+            float randX = Random.Range(-width / 2, -width / 2 + asteroidPadding);
+            float randY = Random.Range(-height / 2, height / 2);
+            randomPosition = new Vector3(randX, randY, 0);
+        }
+        else if (randomZone == 3)
+        {
+            float randX = Random.Range(width / 2 - asteroidPadding, width / 2);
+            float randY = Random.Range(-height / 2, height / 2);
+            randomPosition = new Vector3(randX, randY, 0);
+        }
+
+        return randomPosition;
+    }
+
+    public void PlayerDeath()
+    {
+        playerLives--;
+
+        if (playerLives == 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        else
+        {
+            Destroy(currentPlayer);
+            SpawnPlayer();
         }
     }
 }
