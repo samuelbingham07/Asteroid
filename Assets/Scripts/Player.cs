@@ -1,49 +1,57 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 public class Player : MonoBehaviour
 {
     public InputAction moveAction;
     public InputAction rotateAction;
+    public InputAction fireAction;
     float moveInput;
     float rotateInput;
     Rigidbody2D rBody;
-    public float movePower = 15f;
-    public float rotatePower = 15f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public float movePower = 13f;
+    public float rotatePower = 200f;
+    public float projectileOffset = .8f;
+
+    public GameObject projectilePrefab;
 
     private void OnEnable()
     {
         moveAction.Enable();
         rotateAction.Enable();
+        fireAction.Enable();
     }
 
-    private void Awake()
-    {
-        rBody = GetComponent<Rigidbody2D>();
-    }
     private void OnDisable()
     {
         moveAction.Disable();
         rotateAction.Disable();
+        fireAction.Disable();
     }
 
-    private void FixedUpdate()
-    {
-        moveInput = moveAction.ReadValue<float>();
-        Vector2 moveForce = transform.up * moveInput * movePower * Time.fixedDeltaTime;
-        rBody.AddForce(moveForce, ForceMode2D.Impulse);
-        rotateInput = rotateAction.ReadValue<float>();
-        float rotateForce = rBody.rotation + rotateInput * rotatePower * Time.fixedDeltaTime;
-        rBody.MoveRotation(rotateForce);
-    }
     void Start()
     {
-        
+        rBody = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (fireAction.triggered)
+        {
+            Vector3 projectilePosition = transform.position + transform.up * projectileOffset;
+            Instantiate(projectilePrefab, projectilePosition, transform.rotation);
+        }
+    }
+
+    void FixedUpdate()
+    {
+        moveInput = moveAction.ReadValue<float>();
+        rotateInput = rotateAction.ReadValue<float>();
+
+        Vector2 moveForce = transform.up * moveInput * movePower * Time.fixedDeltaTime;
+        rBody.AddForce(moveForce, ForceMode2D.Impulse);
+
+        float newRotation = rBody.rotation + rotateInput * rotatePower * Time.fixedDeltaTime;
+        rBody.MoveRotation(newRotation);
     }
 }
