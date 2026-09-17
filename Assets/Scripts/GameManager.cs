@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    Animator anim;
+
     public static GameManager instance;
 
     public GameObject player;
@@ -20,6 +23,8 @@ public class GameManager : MonoBehaviour
 
     public int score = 0;
 
+    public TextMeshProUGUI scoreDisplay;
+    public TextMeshProUGUI livesDisplay;
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -34,6 +39,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         StartGame();
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -44,6 +50,7 @@ public class GameManager : MonoBehaviour
     public void AddToScore(int scoreValue)
     {
         score += scoreValue;
+        scoreDisplay.text = "SCORE: " + score.ToString();
     }
 
     void SpawnPlayer()
@@ -129,6 +136,8 @@ public class GameManager : MonoBehaviour
     public void PlayerDeath()
     {
         playerLives--;
+        livesDisplay.text = "LIVES: " + playerLives.ToString();
+
 
         if (playerLives == 0)
         {

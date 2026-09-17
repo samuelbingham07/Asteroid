@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
 
     SpriteRenderer sRenderer;
 
+    Animator anim;
+
     private void OnEnable()
     {
         moveAction.Enable();
@@ -38,6 +40,7 @@ public class Player : MonoBehaviour
     {
         rBody = GetComponent<Rigidbody2D>();
         sRenderer = GetComponent<SpriteRenderer>();
+        anim = GetComponent <Animator>();
     }
 
     void Update()
@@ -65,7 +68,15 @@ public class Player : MonoBehaviour
         moveInput = moveAction.ReadValue<float>();
         rotateInput = rotateAction.ReadValue<float>();
 
-        Vector2 moveForce = transform.up * moveInput * movePower * Time.fixedDeltaTime;
+        if(moveInput > 0)
+        {
+            anim.SetBool("thrust", true);
+        }
+        else
+        {
+            anim.SetBool("thrust", false);
+        }
+            Vector2 moveForce = transform.up * moveInput * movePower * Time.fixedDeltaTime;
         rBody.AddForce(moveForce, ForceMode2D.Impulse);
 
         float newRotation = rBody.rotation + rotateInput * rotatePower * Time.fixedDeltaTime;
@@ -76,7 +87,9 @@ public class Player : MonoBehaviour
     {
         if (isInvincible == false)
         {
+            anim.SetBool("destroy", true);
             GameManager.instance.PlayerDeath();
+
         }
     }
 }

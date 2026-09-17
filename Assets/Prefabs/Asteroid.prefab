@@ -85,7 +85,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0bd25004421b1e4478b72fde9447be07, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -109,6 +109,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Asteroid
   direction: {x: 0.1, y: 0.3}
   speed: 1
+  generation: 1
+  explosion: {fileID: 346958760916015990, guid: ece05abd44c62784aa8774d08c1fedaa, type: 3}
 --- !u!50 &1820189797256580866
 Rigidbody2D:
   serializedVersion: 5

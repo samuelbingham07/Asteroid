@@ -8,6 +8,8 @@ public class Asteroid : MonoBehaviour
 
     public int generation = 1;
 
+    public GameObject explosion;
+
     void Start()
     {
         rbody = GetComponent<Rigidbody2D>();
@@ -18,6 +20,10 @@ public class Asteroid : MonoBehaviour
         float randSize = Random.Range(2, 2.5f);
         float size = randSize / generation;
         transform.localScale = new Vector3(size, size, 1);
+
+        float randRot = Random.Range(0, 360);
+        Vector3 newRot = new Vector3(0, 0, randRot);
+        transform.rotation = Quaternion.Euler(newRot);
 
         direction = Random.insideUnitCircle;
     }
@@ -32,6 +38,8 @@ public class Asteroid : MonoBehaviour
     {
         if (collision.CompareTag("Projectile"))
         {
+            GameObject newExplosion = Instantiate(explosion, transform.position, transform.rotation);
+            Destroy(newExplosion, 1);
             GameManager.instance.AddToScore(50 * generation);
             generation++;
             GameManager.instance.RemoveAsteroid(gameObject);
