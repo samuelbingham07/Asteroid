@@ -22,6 +22,10 @@ public class Player : MonoBehaviour
 
     Animator anim;
 
+    AudioSource playerAudioSource;
+
+    public AudioClip projectileAudio;
+
     private void OnEnable()
     {
         moveAction.Enable();
@@ -41,12 +45,14 @@ public class Player : MonoBehaviour
         rBody = GetComponent<Rigidbody2D>();
         sRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent <Animator>();
+        playerAudioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
         if (fireAction.triggered)
         {
+            playerAudioSource.PlayOneShot(projectileAudio);
             Vector3 projectilePosition = transform.position + transform.up * projectileOffset;
             Instantiate(projectilePrefab, projectilePosition, transform.rotation);
         }
