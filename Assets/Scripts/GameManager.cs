@@ -141,7 +141,9 @@ public class GameManager : MonoBehaviour
 
         if (playerLives == 0)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            HighScoreManager.instance.ScoreCompare(score);
+            SceneManager.LoadScene(1);
+
         }
         else
         {
